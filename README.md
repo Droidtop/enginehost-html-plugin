@@ -1,6 +1,6 @@
-# enginehost Twine plugin
+# Enginehost Twine plugin
 
-This Android plugin runs a compiled Twine 2 HTML story directly from the live
+This Enginehost bundle runs a compiled Twine 2 HTML story directly from the live
 game directory. The story carries its selected story-format runtime; this
 repository does not redistribute Twine or story-format code.
 
@@ -11,6 +11,10 @@ navigation are confined to the supplied game directory.
 
 The first compatibility branch supports compiled stories authored by Twine
 2.0 through 2.12.0 under engineContext `compiled-html`.
+
+GitHub Releases form the version catalog. Every release archive contains its
+signed manifest and signature internally; `enginehost-public-key.json` is the
+repository key Enginehost pins before accepting a bundle.
 
 The Enginehost wrapper is MIT-licensed. Compiled stories and their embedded
 story formats retain their own licenses and are not redistributed here.
