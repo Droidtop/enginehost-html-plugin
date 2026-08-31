@@ -14,10 +14,11 @@ import dev.enginehost.api.EngineControllerEvent;
 import dev.enginehost.api.EnginePlugin;
 import dev.enginehost.api.EnginePluginSession;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import org.json.JSONObject;
 
 /** In-process compiled-Twine runtime with confined navigation and external saves. */
@@ -108,7 +109,15 @@ public final class TwinePlugin implements EnginePlugin {
         @Override public void onPageFinished(WebView view, String url) {
             String saved = "{}";
             try {
-                if (localStorageSave.isFile()) saved = Files.readString(localStorageSave.toPath());
+                if (localStorageSave.isFile()) {
+                    try (FileInputStream input = new FileInputStream(localStorageSave)) {
+                        if (localStorageSave.length() > 4L * 1024 * 1024) throw new IOException("Twine save is too large");
+                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[8192];
+                        for (int count; (count = input.read(buffer)) >= 0;) bytes.write(buffer, 0, count);
+                        saved = bytes.toString(java.nio.charset.StandardCharsets.UTF_8.name());
+                    }
+                }
                 new JSONObject(saved);
             } catch (Exception ignored) {
                 saved = "{}";
@@ -127,7 +136,9 @@ public final class TwinePlugin implements EnginePlugin {
         @JavascriptInterface public void persist(String json) {
             try {
                 JSONObject validated = new JSONObject(json);
-                Files.writeString(localStorageSave.toPath(), validated.toString(), StandardCharsets.UTF_8);
+                try (FileOutputStream output = new FileOutputStream(localStorageSave, false)) {
+                    output.write(validated.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
             } catch (Exception error) {
                 session.host().log(android.util.Log.ERROR, "twine", "Could not persist Twine save data", error);
             }
