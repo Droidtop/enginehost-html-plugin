@@ -1,0 +1,13 @@
+{
+  "algorithm": "SHA256withECDSA",
+  "formatVersion": 1,
+  "issuer": {
+    "algorithm": "SHA256withECDSA",
+    "id": "enginehost-official-v1",
+    "keySha256": "E01B8F3DB54F70F3AC5390EC63158F754FEF1E3716BDCB8DF45E20315651A803",
+    "signature": "MEQCIFRjgSJsZ2OtKqTOMd0anb6ehNjxKJuXXWvqeVdSEsDAAiAWXG55TWl/30k/yoM5GR+wiYe3zuETtPgxNH0PylQhQQ=="
+  },
+  "keySha256": "C168B7B3CB94ABEC8767698BD12446EAFEB6AC99CECFB33D220039A78070E160",
+  "origin": "https://github.com/droidtop/enginehost-twine-plugin",
+  "publicKeySpki": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElRzowloZu1uPJ0xZwShsB++nS+1tZ7O3yVMmAZm14boWdjWaLk+GGOWyx/TXAVnVgEaPrYQPI6cyzcmXX7qzTA=="
+}
