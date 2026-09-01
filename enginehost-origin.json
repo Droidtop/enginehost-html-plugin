@@ -1,0 +1,13 @@
+{
+  "description": "Enginehost plugin implementation repository for Twine",
+  "engine": "twine",
+  "engineContexts": [
+    "compiled-html"
+  ],
+  "formatVersion": 1,
+  "implementation": {
+    "id": "enginehost-native",
+    "name": "Enginehost native"
+  },
+  "origin": "https://github.com/droidtop/enginehost-twine-plugin"
+}
