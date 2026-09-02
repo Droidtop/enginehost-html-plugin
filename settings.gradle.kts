@@ -6,4 +6,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "enginehost-twine-plugin"
-include(":app")
+include(":api", ":app")

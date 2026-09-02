@@ -1,0 +1,59 @@
+{
+  "bundleId": "dev.enginehost.twine.2_12.v1",
+  "engine": "twine",
+  "pluginVersion": "1.0.0",
+  "apiVersion": 1,
+  "entrypoint": "dev.enginehost.plugin.web.TwinePlugin",
+  "origin": "https://github.com/droidtop/enginehost-twine-plugin",
+  "dexFiles": ["classes.dex"],
+  "capabilities": [
+    {
+      "id": "twine-2.12-browser-v1",
+      "engineContext": "compiled-html",
+      "runtimeVersion": "2.12.0",
+      "supportedRanges": [{"min": "2.0", "max": "2.12.0"}]
+    }
+  ],
+  "declaredOptions": [
+    {
+      "key": "allowNetwork",
+      "label": "Allow network access",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Lets the story load http and https resources; off keeps it entirely offline (TwinePlugin.java:43)."
+    },
+    {
+      "key": "javaScript",
+      "label": "JavaScript",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Every compiled Twine story needs this; turning it off is for inspecting a story that misbehaves (TwinePlugin.java:47)."
+    },
+    {
+      "key": "domStorage",
+      "label": "DOM storage",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Enables localStorage, which Twine's save system is built on (TwinePlugin.java:48)."
+    },
+    {
+      "key": "database",
+      "label": "Web SQL database",
+      "type": "boolean",
+      "repeats": false,
+      "description": "Enables the WebView database some older story formats use (TwinePlugin.java:49)."
+    },
+    {
+      "key": "mediaPlaybackRequiresGesture",
+      "label": "Require a tap before audio",
+      "type": "boolean",
+      "repeats": false,
+      "description": "When on, audio and video only start after the reader touches the screen (TwinePlugin.java:54)."
+    }
+  ],
+  "source": {
+    "upstream": "https://github.com/droidtop/enginehost-twine-plugin",
+    "revision": "plugin/2.0-2.12"
+  },
+  "licenses": ["MIT"]
+}
