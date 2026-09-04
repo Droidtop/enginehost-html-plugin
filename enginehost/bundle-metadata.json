@@ -1,8 +1,12 @@
 {
   "bundleId": "dev.enginehost.web.v1",
   "engine": "html",
-  "engines": ["html", "rpgmaker", "flash_air"],
-  "pluginVersion": "1.0",
+  "engines": [
+    "html",
+    "rpgmaker",
+    "flash_air"
+  ],
+  "pluginVersion": "0.1",
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.web.WebGamePlugin",
   "origin": "https://github.com/droidtop/enginehost-twine-plugin",
