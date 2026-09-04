@@ -9,7 +9,7 @@
   "pluginVersion": "0.1",
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.web.WebGamePlugin",
-  "origin": "https://github.com/droidtop/enginehost-twine-plugin",
+  "origin": "https://github.com/droidtop/enginehost-web-plugin",
   "dexFiles": [
     "classes.dex"
   ],
