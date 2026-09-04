@@ -1,13 +1,18 @@
 {
-  "description": "Enginehost plugin implementation repository for Twine",
-  "engine": "twine",
+  "description": "Runs HTML games, RPG Maker MV and MZ, and Flash/AIR in a confined browser with saves kept on disk",
+  "engine": "html",
+  "engines": ["html", "rpgmaker", "flash_air"],
   "engineContexts": [
-    "compiled-html"
+    "compiled-html",
+    "mv",
+    "mz",
+    "swf",
+    "air"
   ],
   "formatVersion": 1,
   "implementation": {
-    "id": "enginehost-native",
-    "name": "Enginehost native"
+    "id": "enginehost-web",
+    "name": "Enginehost web runtime"
   },
-  "origin": "https://github.com/droidtop/enginehost-twine-plugin"
+  "origin": "https://github.com/droidtop/enginehost-web-plugin"
 }
