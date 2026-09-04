@@ -35,6 +35,10 @@ concurrency:
 jobs:
   bundle:
     runs-on: ubuntu-latest
+    # The rolling unstable release is published from this job; the repository's
+    # default token is read-only, so the job asks for write on contents.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
