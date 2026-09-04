@@ -1,51 +1,17 @@
 {
-  "bundleId": "dev.enginehost.web.v1",
+  "bundleId": "dev.enginehost.html.v1",
   "engine": "html",
-  "engines": [
-    "html",
-    "rpgmaker",
-    "flash_air"
-  ],
   "pluginVersion": "0.1",
   "apiVersion": 1,
-  "entrypoint": "dev.enginehost.plugin.web.WebGamePlugin",
-  "origin": "https://github.com/droidtop/enginehost-web-plugin",
+  "entrypoint": "dev.enginehost.plugin.html.HtmlGamePlugin",
+  "origin": "https://github.com/droidtop/enginehost-html-plugin",
   "dexFiles": [
     "classes.dex"
   ],
   "capabilities": [
     {
-      "id": "web-html",
-      "engine": "html",
+      "id": "html-browser",
       "engineContext": "compiled-html",
-      "runtimeVersion": "1.0",
-      "acceptsAnyEngineVersion": true
-    },
-    {
-      "id": "web-rpgmaker-mv",
-      "engine": "rpgmaker",
-      "engineContext": "mv",
-      "runtimeVersion": "1.0",
-      "acceptsAnyEngineVersion": true
-    },
-    {
-      "id": "web-rpgmaker-mz",
-      "engine": "rpgmaker",
-      "engineContext": "mz",
-      "runtimeVersion": "1.0",
-      "acceptsAnyEngineVersion": true
-    },
-    {
-      "id": "web-flash-swf",
-      "engine": "flash_air",
-      "engineContext": "swf",
-      "runtimeVersion": "1.0",
-      "acceptsAnyEngineVersion": true
-    },
-    {
-      "id": "web-air",
-      "engine": "flash_air",
-      "engineContext": "air",
       "runtimeVersion": "1.0",
       "acceptsAnyEngineVersion": true
     }
@@ -95,6 +61,6 @@
     }
   ],
   "licenses": [
-    "MIT (this runtime); Ruffle is MIT/Apache-2.0 and ships as built by the Ruffle project; games and their embedded engines are not redistributed"
+    "MIT (this runtime); games and the story formats they embed are not redistributed"
   ]
 }

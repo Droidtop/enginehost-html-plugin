@@ -1,4 +1,4 @@
-package dev.enginehost.plugin.web;
+package dev.enginehost.plugin.html;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -20,12 +20,11 @@ import org.json.JSONObject;
  * A WebView keeps localStorage in the app's private data, where it cannot
  * be backed up, moved to another device, or found by the person who owns
  * the saves; and every page served from the same origin shares one store,
- * so two games would overwrite each other. This bridge is what the page's
- * localStorage becomes instead: {@link GameServer} injects a script before
- * the page's first script runs that replaces window.localStorage with an
- * object calling these methods. Calls are synchronous, so the page sees
- * ordinary Storage semantics; writes are coalesced and land in
- * localStorage.json a moment later, and always on pause.
+ * so two games would overwrite each other. {@link GameServer} injects a
+ * script before the page's first script runs that replaces
+ * window.localStorage with an object calling these methods. Calls are
+ * synchronous, so the page sees ordinary Storage semantics; writes are
+ * coalesced and land in localStorage.json a moment later, and always on pause.
  */
 public final class LocalStorageBridge {
     static final String JS_NAME = "EnginehostStorage";
@@ -54,16 +53,7 @@ public final class LocalStorageBridge {
         if (!file.isFile()) return;
         try {
             if (file.length() > MAX_FILE_BYTES) throw new IOException("localStorage.json is too large to be a save file");
-            byte[] bytes = new byte[(int) file.length()];
-            try (FileInputStream input = new FileInputStream(file)) {
-                int offset = 0;
-                while (offset < bytes.length) {
-                    int count = input.read(bytes, offset, bytes.length - offset);
-                    if (count < 0) break;
-                    offset += count;
-                }
-            }
-            JSONObject json = new JSONObject(new String(bytes, StandardCharsets.UTF_8));
+            JSONObject json = new JSONObject(new String(GameServer.readAll(file), StandardCharsets.UTF_8));
             for (Iterator<String> keys = json.keys(); keys.hasNext();) {
                 String key = keys.next();
                 entries.put(key, json.getString(key));
@@ -106,7 +96,7 @@ public final class LocalStorageBridge {
             try {
                 json.put(entry.getKey(), entry.getValue());
             } catch (JSONException ignored) {
-                // A key or value JSONObject refuses is one it cannot round-trip; nothing to store.
+                // A value JSONObject refuses cannot round-trip; nothing to store.
             }
         }
         return json;
@@ -141,12 +131,8 @@ public final class LocalStorageBridge {
     /**
      * The script that makes the page's localStorage this store. Injected at
      * the top of every HTML document served, ahead of any game script. It
-     * mirrors the store into a plain object so reads never cross the
-     * bridge, and forwards every write.
-     *
-     * RPG Maker MZ saves through localforage, which prefers IndexedDB; the
-     * script points it at localStorage the moment the library appears, so
-     * those saves land in the same file.
+     * mirrors the store into a plain object so reads never cross the bridge,
+     * and forwards every write.
      */
     static String script() {
         return "(function(){\n"
@@ -171,10 +157,6 @@ public final class LocalStorageBridge {
             + " getOwnPropertyDescriptor:function(t,p){if(typeof p==='string'&&own(p))return{value:data[p],writable:true,enumerable:true,configurable:true};return undefined;}\n"
             + "});\n"
             + "try{Object.defineProperty(window,'localStorage',{get:function(){return proxy;},configurable:true});}catch(e){}\n"
-            + "var forage;\n"
-            + "try{Object.defineProperty(window,'localforage',{configurable:true,\n"
-            + " get:function(){return forage;},\n"
-            + " set:function(v){forage=v;try{if(v&&v.config&&v.LOCALSTORAGE)v.config({driver:[v.LOCALSTORAGE]});}catch(e){}}});}catch(e){}\n"
             + "})();\n";
     }
 }
