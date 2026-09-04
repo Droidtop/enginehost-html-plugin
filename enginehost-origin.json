@@ -14,5 +14,5 @@
     "id": "enginehost-web",
     "name": "Enginehost web runtime"
   },
-  "origin": "https://github.com/droidtop/enginehost-web-plugin"
+  "origin": "https://github.com/droidtop/enginehost-twine-plugin"
 }
