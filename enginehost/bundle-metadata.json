@@ -4,7 +4,7 @@
   "pluginVersion": "1.0.0",
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.web.TwinePlugin",
-  "origin": "https://github.com/droidtop/enginehost-twine-plugin",
+  "origin": "https://github.com/droidtop/enginehost-html-plugin",
   "dexFiles": ["classes.dex"],
   "capabilities": [
     {
@@ -15,7 +15,7 @@
     }
   ],
   "source": {
-    "upstream": "https://github.com/droidtop/enginehost-twine-plugin",
+    "upstream": "https://github.com/droidtop/enginehost-html-plugin",
     "revision": "plugin/2.0-2.12"
   },
   "licenses": ["MIT"]
