@@ -83,7 +83,7 @@ jobs:
       contents: read
     uses: Droidtop/enginehost/.github/workflows/sign-engine-bundle.yml@4b9e41cb231b293d08852890aef54b619d4d57ec
     with:
-      tooling-sha: 74162ce067087af604ee5a54edcd09eb9f872922
+      tooling-sha: 4b9e41cb231b293d08852890aef54b619d4d57ec
       unsigned-artifact: enginehost-html-v1-unsigned
       bundle: dev.enginehost.html.v1.enginehost.tar.xz
       artifact-name: enginehost-html-v1
