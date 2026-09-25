@@ -118,14 +118,62 @@ final class GameServer {
         throw new IOException("No HTML page found at the game folder's root; set execFile to the page to open");
     }
 
+    /**
+     * The configured entry page, or an error that says which of the three
+     * things is wrong: the path leaves the game folder, it names a folder,
+     * or there is no such file. Those used to share one sentence ("is not
+     * inside the game folder"), which for the common case, a page that is
+     * simply missing, pointed at the wrong problem (rig, 2026-09-24: the
+     * folder held only a Syncthing conflict copy of the page).
+     */
     private File confinedFile(String relative) throws IOException {
         if (new File(relative).isAbsolute()) throw new IOException("The entry file must be relative to the game folder");
         File file = new File(gameRoot, relative).getCanonicalFile();
-        if (!file.getPath().startsWith(gameRoot.getPath() + File.separator) || !file.isFile()) {
-            throw new IOException("The entry file " + relative + " is not inside the game folder");
+        if (!file.getPath().startsWith(gameRoot.getPath() + File.separator)) {
+            throw new IOException("The entry file " + relative + " points outside the game folder");
         }
+        if (file.isDirectory()) {
+            throw new IOException("The entry file " + relative + " is a folder, not a page");
+        }
+        if (!file.isFile()) throw new IOException(missingEntry(relative, file));
         return file;
     }
+
+    /**
+     * Says the entry page is missing, naming what the folder it should be in
+     * does hold: files whose names start like the page's (a renamed or
+     * conflict copy is the usual reason a page goes missing), else the pages
+     * that are there, so the fix is in the sentence.
+     */
+    private static String missingEntry(String relative, File expected) {
+        String message = "Cannot find the entry file " + relative + " in the game folder";
+        File folder = expected.getParentFile();
+        String[] names = folder == null ? null : folder.list();
+        if (names == null) return message + ".";
+        Arrays.sort(names);
+        String wanted = expected.getName().toLowerCase(Locale.ROOT);
+        int dot = wanted.lastIndexOf('.');
+        String stem = dot > 0 ? wanted.substring(0, dot) : wanted;
+        StringBuilder similar = new StringBuilder();
+        StringBuilder pages = new StringBuilder();
+        int similarCount = 0;
+        int pageCount = 0;
+        for (String name : names) {
+            String lower = name.toLowerCase(Locale.ROOT);
+            if (lower.startsWith(stem) && similarCount < LISTED) {
+                similar.append(similarCount++ == 0 ? "" : ", ").append(name);
+            }
+            if ((lower.endsWith(".html") || lower.endsWith(".htm")) && pageCount < LISTED) {
+                pages.append(pageCount++ == 0 ? "" : ", ").append(name);
+            }
+        }
+        if (similarCount > 0) return message + ". Files there with a similar name: " + similar + ".";
+        if (pageCount > 0) return message + ". Pages there: " + pages + ".";
+        return message + ". The folder it should be in holds no HTML page.";
+    }
+
+    /** How many names a missing-entry message lists at most. */
+    private static final int LISTED = 5;
 
     /** The file a URL path names, or null when it would leave the game folder. */
     private File confined(String path) {
