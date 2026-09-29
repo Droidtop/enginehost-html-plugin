@@ -1,7 +1,7 @@
 {
   "bundleId": "dev.enginehost.html.v1",
   "engine": "html",
-  "pluginVersion": "0.1",
+  "pluginVersion": "1.0.0",
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.html.HtmlGamePlugin",
   "origin": "https://github.com/droidtop/enginehost-html-plugin",
