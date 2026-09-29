@@ -1,7 +1,7 @@
 {
   "bundleId": "dev.enginehost.twine.2_12.v1",
   "engine": "twine",
-  "pluginVersion": "1.0.0",
+  "pluginVersion": "1.0.1",
   "apiVersion": 1,
   "entrypoint": "dev.enginehost.plugin.web.TwinePlugin",
   "origin": "https://github.com/droidtop/enginehost-html-plugin",
