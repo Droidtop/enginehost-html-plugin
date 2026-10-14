@@ -61,6 +61,6 @@
     }
   ],
   "licenses": [
-    "MIT (this runtime); games and the story formats they embed are not redistributed"
+    "GPL-3.0 (this runtime); games and the story formats they embed are not redistributed"
   ]
 }
