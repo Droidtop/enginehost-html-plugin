@@ -1,7 +1,7 @@
 plugins { id("com.android.library") }
 
 android {
-    namespace = "dev.enginehost.plugin.web"
+    namespace = "dev.enginehost.plugin.html"
     compileSdk = 36
     defaultConfig {
         minSdk = 26

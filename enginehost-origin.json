@@ -1,0 +1,13 @@
+{
+  "description": "Runs HTML games (Twine stories included) in a confined browser with saves kept on disk",
+  "engine": "html",
+  "engineContexts": [
+    "compiled-html"
+  ],
+  "formatVersion": 1,
+  "implementation": {
+    "id": "enginehost-html",
+    "name": "Enginehost HTML runtime"
+  },
+  "origin": "https://github.com/droidtop/enginehost-html-plugin"
+}

@@ -5,5 +5,5 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories { google(); mavenCentral() }
 }
-rootProject.name = "enginehost-twine-plugin"
+rootProject.name = "enginehost-html-plugin"
 include(":api", ":app")
