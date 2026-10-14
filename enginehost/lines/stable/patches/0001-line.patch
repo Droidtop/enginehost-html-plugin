@@ -1,0 +1,175 @@
+diff --git a/app/src/main/java/dev/enginehost/plugin/web/GameWebActivity.java b/app/src/main/java/dev/enginehost/plugin/web/GameWebActivity.java
+deleted file mode 100644
+index 4dd176df7b0cdbdbc6b2ba187b4e18f3582037cd..0000000000000000000000000000000000000000
+--- a/app/src/main/java/dev/enginehost/plugin/web/GameWebActivity.java
++++ /dev/null
+@@ -1,126 +0,0 @@
+-package dev.enginehost.plugin.web;
+-
+-import android.app.Activity;
+-import android.os.Bundle;
+-import android.net.Uri;
+-import android.view.View;
+-import android.webkit.WebChromeClient;
+-import android.webkit.WebSettings;
+-import android.webkit.WebView;
+-import android.webkit.WebViewClient;
+-import android.webkit.WebResourceRequest;
+-import android.webkit.WebResourceResponse;
+-import android.widget.Toast;
+-
+-import java.io.File;
+-import java.io.ByteArrayInputStream;
+-import java.io.IOException;
+-import org.json.JSONException;
+-import org.json.JSONObject;
+-
+-abstract class GameWebActivity extends Activity {
+-    protected WebView webView;
+-    protected File gameRoot;
+-    private boolean allowNetwork;
+-
+-    @Override
+-    protected void onCreate(Bundle state) {
+-        super.onCreate(state);
+-        String path = getIntent().getStringExtra("path");
+-        try {
+-            validateEngineRequest();
+-            if (path == null) throw new IOException("enginehost did not provide a game folder");
+-            gameRoot = new File(path).getCanonicalFile();
+-            if (!gameRoot.isDirectory()) throw new IOException("enginehost game folder is not readable");
+-        } catch (IOException exception) {
+-            fail(exception.getMessage());
+-            return;
+-        }
+-
+-        getWindow().getDecorView().setSystemUiVisibility(
+-            View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+-        webView = new WebView(this);
+-        WebSettings settings = webView.getSettings();
+-        JSONObject options;
+-        try { options = new JSONObject(getIntent().getStringExtra("options") == null ? "{}" : getIntent().getStringExtra("options")); }
+-        catch (JSONException error) { fail("options must be valid JSON"); return; }
+-        allowNetwork = options.optBoolean("allowNetwork", false);
+-        settings.setJavaScriptEnabled(options.optBoolean("javaScript", true));
+-        settings.setDomStorageEnabled(options.optBoolean("domStorage", true));
+-        settings.setDatabaseEnabled(options.optBoolean("database", true));
+-        settings.setAllowFileAccess(true);
+-        settings.setAllowContentAccess(false);
+-        settings.setAllowFileAccessFromFileURLs(true);
+-        settings.setMediaPlaybackRequiresUserGesture(options.optBoolean("mediaPlaybackRequiresGesture", false));
+-        settings.setBlockNetworkLoads(!allowNetwork);
+-        webView.setWebChromeClient(new WebChromeClient());
+-        webView.setWebViewClient(new WebViewClient() {
+-            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+-                return !isAllowed(request.getUrl());
+-            }
+-            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+-                if (isAllowed(request.getUrl())) return super.shouldInterceptRequest(view, request);
+-                return new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream(new byte[0]));
+-            }
+-        });
+-        setContentView(webView);
+-
+-        try {
+-            loadGame();
+-        } catch (Exception exception) {
+-            fail(exception.getMessage());
+-        }
+-    }
+-
+-    protected abstract void loadGame() throws Exception;
+-
+-    protected abstract void validateEngineRequest() throws IOException;
+-
+-    private boolean isAllowed(Uri uri) {
+-        String scheme = uri.getScheme();
+-        if (scheme == null || "about".equals(scheme) || "data".equals(scheme)) return true;
+-        if ("http".equals(scheme) || "https".equals(scheme)) return allowNetwork;
+-        if (!"file".equals(scheme)) return false;
+-        String path = uri.getPath();
+-        try {
+-            File file = new File(path == null ? "" : path).getCanonicalFile();
+-            return file.getPath().startsWith(gameRoot.getPath() + File.separator);
+-        } catch (IOException ignored) { return false; }
+-    }
+-
+-    protected final boolean versionInRange(String version, String min, String max) {
+-        if (version == null || !version.matches("\\d+(\\.\\d+)+")) return false;
+-        return compareVersions(version, min) >= 0 && compareVersions(version, max) <= 0;
+-    }
+-
+-    private int compareVersions(String left, String right) {
+-        String[] a = left.split("\\."), b = right.split("\\.");
+-        for (int i = 0; i < Math.max(a.length, b.length); i++) {
+-            int av = i < a.length ? Integer.parseInt(a[i]) : 0;
+-            int bv = i < b.length ? Integer.parseInt(b[i]) : 0;
+-            if (av != bv) return Integer.compare(av, bv);
+-        }
+-        return 0;
+-    }
+-
+-    protected File confinedFile(String requested) throws IOException {
+-        File file = new File(gameRoot, requested).getCanonicalFile();
+-        String prefix = gameRoot.getPath() + File.separator;
+-        if (!file.getPath().startsWith(prefix) || !file.isFile()) {
+-            throw new IOException("Requested entry file is not inside the game folder");
+-        }
+-        return file;
+-    }
+-
+-    protected void fail(String message) {
+-        Toast.makeText(this, message == null ? "Runtime failed" : message, Toast.LENGTH_LONG).show();
+-        finish();
+-    }
+-
+-    @Override
+-    protected void onDestroy() {
+-        if (webView != null) webView.destroy();
+-        super.onDestroy();
+-    }
+-}
+diff --git a/app/src/main/java/dev/enginehost/plugin/web/TwineActivity.java b/app/src/main/java/dev/enginehost/plugin/web/TwineActivity.java
+deleted file mode 100644
+index 5de2c098c9bac4c640bb0dce773a292c4c5860f3..0000000000000000000000000000000000000000
+--- a/app/src/main/java/dev/enginehost/plugin/web/TwineActivity.java
++++ /dev/null
+@@ -1,37 +0,0 @@
+-package dev.enginehost.plugin.web;
+-
+-import java.io.File;
+-import java.io.IOException;
+-
+-/** Runs a compiled, self-contained Twine story directly from its live folder. */
+-public final class TwineActivity extends GameWebActivity {
+-    @Override
+-    protected void validateEngineRequest() throws IOException {
+-        String context = getIntent().getStringExtra("engineContext");
+-        String version = getIntent().getStringExtra("engineVersion");
+-        if (!"compiled-html".equals(context) || !versionInRange(version, "2.0", "2.12.0")) {
+-            throw new IOException("Unsupported Twine context or engineVersion");
+-        }
+-    }
+-
+-    @Override
+-    protected void loadGame() throws IOException {
+-        String requested = getIntent().getStringExtra("execFile");
+-        File story;
+-        if (requested != null && !requested.trim().isEmpty()) {
+-            story = confinedFile(requested);
+-        } else {
+-            story = findCompiledStory();
+-        }
+-        webView.getSettings().setAllowUniversalAccessFromFileURLs(false);
+-        webView.loadUrl(story.toURI().toString());
+-    }
+-
+-    private File findCompiledStory() throws IOException {
+-        File index = new File(gameRoot, "index.html");
+-        if (index.isFile()) return index.getCanonicalFile();
+-        File[] files = gameRoot.listFiles((dir, name) -> name.toLowerCase().endsWith(".html"));
+-        if (files != null && files.length == 1) return files[0].getCanonicalFile();
+-        throw new IOException("Set execFile to the compiled Twine HTML story");
+-    }
+-}
