@@ -12,5 +12,9 @@ navigation are confined to the supplied game directory.
 The first compatibility branch supports compiled stories authored by Twine
 2.0 through 2.12.0 under engineContext `compiled-html`.
 
-The Enginehost wrapper is MIT-licensed. Compiled stories and their embedded
+The Enginehost wrapper is GPL-3.0 licensed. Compiled stories and their embedded
 story formats retain their own licenses and are not redistributed here.
+
+## Licence
+
+GPL-3.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). All code here is ours; the third-party attributions in NOTICE and THIRD_PARTY.md keep their own notices.
