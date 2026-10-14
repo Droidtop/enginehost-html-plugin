@@ -9,11 +9,11 @@ shipped there.
 
 | Component | Version / commit | Licence | Source | Where in tree |
 |---|---|---|---|---|
-| Enginehost's own wrapper (WebView bridge, `localStorage` save shim, audio fallback) | this repository | MIT | https://github.com/Droidtop/enginehost-html-plugin | entire tree |
+| Enginehost's own wrapper (WebView bridge, `localStorage` save shim, audio fallback) | this repository | GPL-3.0 | https://github.com/Droidtop/enginehost-html-plugin | entire tree |
 | HTML/Twine game engines (SugarCube, Harlowe, etc.) | supplied per-game | not applicable (not vendored) | shipped inside each game's own files | never present in this repository |
 | RPG Maker MV/MZ runtime | supplied per-game | not applicable (not vendored) | shipped inside each game's own `www` folder | never present in this repository |
 
 ## Obligations
 
-None beyond MIT's notice-preservation requirement for this repository's own
+None beyond the GPL-3.0 terms (LICENSE) for this repository's own
 code; no third-party runtime or engine source is bundled or redistributed.

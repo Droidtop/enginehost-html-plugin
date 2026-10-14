@@ -1,0 +1,5 @@
+HTML runtime for Enginehost
+Copyright the Enginehost contributors. Licensed under the GNU General Public License, version 3 (LICENSE).
+
+A WebView wrapper for HTML and Twine games. It vendors no game engine and no third-party runtime; the
+games and the story formats they embed are not redistributed and keep their own terms.
