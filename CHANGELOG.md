@@ -11,6 +11,8 @@ release of its own (`<bundle>-build.<run>`), which is never overwritten.
 
 ### Added
 
+- A link a story opens (a link, a location change or window.open) is offered by Enginehost: open in
+  the app it belongs to, in a browser, copy, or not. It used to be dropped without a word.
 - A permanent, never-overwritten release for every bundle build published
   to any channel, so a version that was once installable stays that way in
   the release history even after the next push moves the channel pointers.
