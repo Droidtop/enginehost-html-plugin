@@ -1,110 +1,40 @@
 package dev.enginehost.plugin.html;
 
-import android.annotation.SuppressLint;
 import android.view.KeyEvent;
-import android.view.ViewGroup;
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import dev.enginehost.api.EngineControllerEvent;
 import dev.enginehost.api.EnginePlugin;
 import dev.enginehost.api.EnginePluginSession;
-import java.io.File;
+import dev.enginehost.web.GameServer;
+import dev.enginehost.web.GameWebView;
 import java.io.IOException;
-import org.json.JSONObject;
 
 /**
  * HTML games (Twine stories among them) in a confined browser.
  *
- * The game is served from its own folder over a private https origin (see
- * {@link GameServer}) rather than opened as file:// URLs, so the page has a
- * real origin and stays inside its folder. Saves never live in the WebView:
- * {@link LocalStorageBridge} replaces localStorage with a store whose file
- * sits in the save folder Enginehost chose for this game.
+ * The browser, the private https origin the game is served from and the
+ * save-folder localStorage are Enginehost's plugin-web ({@link GameWebView}),
+ * shared with the RPG Maker MV/MZ core. What is this core's own: the engine
+ * it accepts, the pages a game folder may start at, and the keys a pad's
+ * actions become.
  */
 public final class HtmlGamePlugin implements EnginePlugin {
     private static final String TAG = "enginehost-html";
 
-    private EnginePluginSession session;
-    private WebView webView;
-    private GameServer server;
-    private LocalStorageBridge storage;
+    private static final GameServer.Site SITE = () -> new String[] {"index.html", "index.htm"};
+
+    private GameWebView game;
 
     @Override
-    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public void onCreate(EnginePluginSession session) throws Exception {
         if (!"html".equals(session.engine())) throw new IOException("This runtime runs html games, not " + session.engine());
-        this.session = session;
-        File gameRoot = new File(session.gamePath()).getCanonicalFile();
-        if (!gameRoot.isDirectory()) throw new IOException("The game folder is not readable");
-        JSONObject options = new JSONObject(session.optionsJson() == null ? "{}" : session.optionsJson());
-
-        storage = new LocalStorageBridge(new File(session.host().saveDirectory(), "localStorage.json"),
-            (priority, message, error) -> session.host().log(priority, TAG, message, error));
-        server = new GameServer(gameRoot, session.execFile(), options);
-
-        webView = new WebView(session.host().context());
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(options.optBoolean("javaScript", true));
-        settings.setDomStorageEnabled(true); // sessionStorage; saves go through the bridge
-        settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(false);
-        settings.setMediaPlaybackRequiresUserGesture(options.optBoolean("mediaPlaybackRequiresGesture", false));
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(true);
-        String userAgent = options.optString("userAgent", "");
-        if (!userAgent.isBlank()) settings.setUserAgentString(userAgent);
-        WebView.setWebContentsDebuggingEnabled(options.optBoolean("webContentsDebugging", false));
-        webView.setBackgroundColor(0xFF000000);
-        webView.addJavascriptInterface(storage, LocalStorageBridge.JS_NAME);
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override public boolean onConsoleMessage(ConsoleMessage message) {
-                int priority = message.messageLevel() == ConsoleMessage.MessageLevel.ERROR ? android.util.Log.ERROR : android.util.Log.DEBUG;
-                session.host().log(priority, TAG, message.message() + " (" + message.sourceId() + ":" + message.lineNumber() + ")", null);
-                return true;
-            }
-        });
-        webView.setWebViewClient(new WebViewClient() {
-            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (server.serves(request.getUrl())) return false;
-                // A link the story opens (an <a>, a location change or window.open, which stays in
-                // this view): offered by Enginehost and never opened here (Enginehost docs/SPEC.md,
-                // "Links a game opens"; Droidtop/tracker#635). Only a navigation the person caused
-                // is offered, so a story cannot raise the sheet by itself; the view never leaves it.
-                if (request.isForMainFrame() && request.hasGesture()) offerLink(request.getUrl().toString());
-                return true;
-            }
-
-            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                try {
-                    return server.respond(request);
-                } catch (IOException error) {
-                    session.host().log(android.util.Log.WARN, TAG, "Could not serve " + request.getUrl(), error);
-                    return GameServer.status(500, "Internal error");
-                }
-            }
-        });
-        session.display().addView(webView, new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        game = GameWebView.open(session, TAG, SITE);
         // The page has the keyboard from the start: Android hands a keyboard's keys to the
         // focused view, and with none focused a story ignored Enter until it was tapped
         // (Enginehost's emulator conformance run, Droidtop/tracker#27).
-        webView.setFocusableInTouchMode(true);
-        webView.requestFocus();
-        webView.loadUrl(server.entryUrl());
-    }
-
-    private void offerLink(String url) {
-        try {
-            session.host().openLink(url);
-        } catch (IncompatibleClassChangeError olderHost) {
-            // An Enginehost from before openLink(): the link is not opened, as before.
-            session.host().log(android.util.Log.INFO, TAG, "This Enginehost cannot offer a link; it was not opened", null);
-        }
+        WebView view = game.view();
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
     }
 
     @Override public boolean onControllerEvent(EngineControllerEvent event) {
@@ -118,24 +48,15 @@ public final class HtmlGamePlugin implements EnginePlugin {
             case "cancel": case "menu": key = KeyEvent.KEYCODE_ESCAPE; break;
             default: return false;
         }
-        if (webView == null) return false;
+        WebView view = game == null ? null : game.view();
+        if (view == null) return false;
         int action = event.pressed() ? KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
-        return webView.dispatchKeyEvent(new KeyEvent(event.eventTime(), event.eventTime(), action, key, 0));
+        return view.dispatchKeyEvent(new KeyEvent(event.eventTime(), event.eventTime(), action, key, 0));
     }
 
-    @Override public void onResume() { if (webView != null) webView.onResume(); }
+    @Override public void onResume() { if (game != null) game.onResume(); }
 
-    @Override public void onPause() {
-        if (webView != null) webView.onPause();
-        if (storage != null) storage.flush();
-    }
+    @Override public void onPause() { if (game != null) game.onPause(); }
 
-    @Override public void onDestroy() {
-        if (storage != null) storage.flush();
-        if (webView != null) {
-            webView.stopLoading();
-            webView.destroy();
-            webView = null;
-        }
-    }
+    @Override public void onDestroy() { if (game != null) game.onDestroy(); }
 }
