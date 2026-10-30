@@ -9,6 +9,15 @@ release of its own (`<bundle>-build.<run>`), which is never overwritten.
 
 ## [Unreleased]
 
+## [1.0.7]
+
+### Changed
+- HTML and Twine games always run locked down: files only through Enginehost's broker, no
+  sockets, no exec. The page itself runs in WebView's own renderer, which Android isolates
+  (`isolated_app`). It passed the rig on the AVD with a Play Store WebView and TrichromeLibrary
+  (Droidtop/tracker#550), on Enginehost from ef4428d. The "Run unsandboxed?" sheet no longer
+  appears for this core.
+
 ### Added
 
 - A link a story opens (a link, a location change or window.open) is offered by Enginehost: open in
