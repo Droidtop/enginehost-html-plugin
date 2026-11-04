@@ -9,6 +9,12 @@ release of its own (`<bundle>-build.<run>`), which is never overwritten.
 
 ## [Unreleased]
 
+### Added
+- The Twine core is back as its own line, `plugin/twine-2.12` (bundle `dev.enginehost.twine.2_12.v1`,
+  Twine 1.1.0), with its own wrapper, TwinePlugin. The 2026-10-14 restructure into lines dropped it
+  as "on no line", which left Twine stories only on the HTML core. The owner: every engine keeps its
+  own core (Droidtop/tracker#28, 2026-11-04). The HTML core is unchanged.
+
 ## [1.0.7]
 
 ### Changed
