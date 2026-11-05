@@ -39,3 +39,11 @@ redistributed.
 ## Licence
 
 GPL-3.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). All code here is ours; the third-party attributions in NOTICE and THIRD_PARTY.md keep their own notices.
+
+## Branches
+
+This core has no upstream engine, so it has no `upstream-sync` (Droidtop/tracker#324, the owner,
+2026-11-05). `plugin-core`, the default branch, is everything: the runtime, the build workflows,
+the bundle metadata and the line pins. Each `plugin/<line>` is composed from `plugin-core` alone
+(its `enginehost/lines/<line>/line.json` has `"upstream": null`) by the plugin-line tool; nothing on
+it is written by hand.
