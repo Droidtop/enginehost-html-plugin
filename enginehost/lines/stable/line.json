@@ -1,8 +1,4 @@
 {
-  "upstream": {
-    "repo": "Droidtop/enginehost-html-plugin",
-    "ref": "main 7c9e532 (no upstream engine)",
-    "commit": "fa2624274937dbe8342c76ea3a1c0e6c134e5e4a"
-  },
+  "upstream": null,
   "version": "1.0"
 }
